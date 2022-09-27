@@ -3,11 +3,11 @@
     <h1 class="logo"><img src="../assets/img/indexLogo.6f8ac4f0.png" alt=""></h1>
     <div class="nav">
         <ul>
-        <li class="active">首页</li>
-        <li>全部商品</li>
-        <li>个人中心</li>
-        <li>我的订单</li>
-        <li>专属福利</li>
+        <li><router-link to="/home" active-class="active">首页</router-link></li>
+        <li><router-link to="/allproduct" active-class="active">全部商品</router-link></li>
+        <li><router-link to="/person" active-class="active">个人中心</router-link></li>
+        <li><router-link to="/myorder" active-class="active">我的订单</router-link></li>
+        <li><router-link to="/mywelfare" active-class="active">专属福利</router-link></li>
         </ul>
         </div>
     <div class="search">
@@ -40,6 +40,10 @@ export default {
 	        font-stretch: normal;
 	        line-height: 22.81px;
 	        letter-spacing: 0px;
+            .active{
+                color: #0a328e;
+                font-weight: 700;
+            }
         }
     }
     .search {
