@@ -19,7 +19,7 @@
 
 <script>
 export default {
-    name:'Footer'
+    name:'Header'
 }
 </script>
 
@@ -41,7 +41,7 @@ export default {
 	        line-height: 22.81px;
 	        letter-spacing: 0px;
             .active{
-                color: #0a328e;
+                color: var(--basecolor);
                 font-weight: 700;
             }
         }

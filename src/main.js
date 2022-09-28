@@ -3,8 +3,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import '@/assets/reset.css'
+import SlideVerify from 'vue-monoplasty-slide-verify'
+Vue.use(SlideVerify)
 Vue.config.productionTip = false
-
 new Vue({
   router,
   store,

@@ -10,7 +10,7 @@
             <li>我的积分：--   </li>
             <li>获取积分</li>
             <li>叩丁狼官网</li>
-            <li class="loginbtn">
+            <li class="loginbtn" @click="toLogin">
                 登录
             </li>
         </ul>
@@ -21,8 +21,17 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 export default {
-    name:'TopBar'
+    name:'TopBar',
+    methods:{
+        ...mapMutations({
+            changeShowLoginModal:"ShowLoginModal/changeShowLoginModal"
+        }),
+        toLogin(){
+            this.changeShowLoginModal()
+        }
+    }
 }
 </script>
 
@@ -52,7 +61,7 @@ export default {
                 &.loginbtn{
                 width: 124px;
 	            height: 40px;
-	            background-color: #0a328e;
+	            background-color: var(--basecolor);
                 text-align: center;
                 justify-content: center;
             }
