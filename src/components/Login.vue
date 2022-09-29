@@ -23,7 +23,7 @@
               type="text"
               ref="phone"
               placeholder="请输入手机号"
-              v-model="phoneNumber"
+              v-model.trim="phoneNumber"
             />
           </div>
           <div class="ipt-group mb20">
@@ -42,7 +42,11 @@
             ></slide-verify>
           </div>
           <div class="ipt-group code mb20">
-            <input type="text" placeholder="请输入验证码" />
+            <input
+              type="text"
+              placeholder="请输入验证码"
+              v-model.trim="smsCode"
+            />
             <div class="btn" :class="isShowCount ? 'has-count' : ''">
               <span v-show="!isShowCount" @click="getVerificationCode"
                 >获取验证码</span
@@ -60,6 +64,10 @@
 
 <script>
 import { mapMutations } from "vuex";
+// 导入获取数据验证码的api
+import { SendSmsAPI } from "@/API";
+// 导入发送登录请求的方法
+import { SendLoginRequest } from "@/API";
 // 导入验证手机号是否正确的方法
 import verifyPhoneNumber from "@/utils/verifyPhoneNumber";
 export default {
@@ -71,19 +79,22 @@ export default {
       // 滑块提示文字
       msg: "请向右滑动",
       // 用户输入的手机号
-      phoneNumber: "",
+      phoneNumber: "19937714073",
       // 控制倒计时的显示
       isShowCount: false,
       // 倒计时数字
       count: 60,
+      // 短信验证码
+      smsCode: "34545",
     };
   },
   methods: {
     ...mapMutations({
       changeShowLoginModal: "ShowLoginModal/changeShowLoginModal",
+      changeIsLogined: "LoginStatus/changeIsLogined",
     }),
     close() {
-      this.changeShowLoginModal();
+      this.changeShowLoginModal(false);
     },
     // 滑块验证成功
     onSuccess(times) {
@@ -99,25 +110,55 @@ export default {
       this.msg = "再试⼀次";
     },
     // 点击登录执行这里的回调
-    submitLogin() {
-      if (this.msg == "再试一次" || this.msg == "请向右滑动") {
-        alert("登录失败");
+    async submitLogin() {
+      if (!this.verifyForm()) {
         return;
       }
-      alert("登录成功");
+      if (!this.smsCode) {
+        alert("请输入验证码");
+        return;
+      }
+      let res = await SendLoginRequest({
+        phone: this.phoneNumber,
+        verifyCode: this.smsCode,
+      });
+      if (res) {
+        alert("登录成功");
+        this.close();
+        // 本地存储token
+        localStorage.setItem("x-auth-token", res["x-auth-token"]);
+        this.changeIsLogined(true);
+      }
     },
-    // 点击获取验证码执行这里的函数
-    getVerificationCode() {
+    // 验证表单是否正确的函数
+    verifyForm() {
+      // 验证滑块是否验证成功
+      if (this.msg == "再试一次" || this.msg == "请向右滑动") {
+        alert("滑块失败");
+        return false;
+      }
+      // 验证手机号输入格式是否正确1
       var isTrue = verifyPhoneNumber(this.phoneNumber);
       if (!isTrue) {
-        alert("验证失败");
-        this.$refs.phone.focus()
-        this.phoneNumber=''
+        alert("请输入正确的手机号");
+        this.$refs.phone.focus();
+        this.phoneNumber = "";
+        return false;
+      }
+      return true;
+    },
+    // 点击获取验证码执行这里的函数
+    async getVerificationCode() {
+      if (!this.verifyForm()) {
         return;
       }
-      alert("验证成功");
-      this.countDown();
-      this.isShowCount = true;
+      // 获取短信验证码
+      let res = await SendSmsAPI({ phone: this.phoneNumber });
+      if (res) {
+        alert("短信验证码发送成功");
+        this.countDown();
+        this.isShowCount = true;
+      }
     },
     // 倒计时变化
     countDown() {

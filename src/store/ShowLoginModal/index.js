@@ -1,13 +1,14 @@
 export default {
-    namespaced:true,
-    state: {
-        isShow:false
+  namespaced: true,
+  state: {
+    // 登录模态框显示状态
+    isShow: false,
+  },
+  mutations: {
+    // 改变登录模态框显示状态
+    changeShowLoginModal(state, playLoad) {
+      state.isShow = playLoad;
     },
-    mutations: {
-        changeShowLoginModal(state){
-            state.isShow=!state.isShow
-        }
-    },
-    actions: {
-    },
-}
+  },
+  actions: {},
+};
