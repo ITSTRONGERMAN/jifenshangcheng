@@ -20,7 +20,7 @@ instance.interceptors.request.use(
 // 创建响应拦截器
 instance.interceptors.response.use(
   (res) => {
-    // 这个函数什么时候执行？后端返回数据并在组贱内部处理之前执行
+    // 这个函数什么时候执行？后端返回数据并在组件内部处理之前执行
     // res 是axios封装的关于本次的响应
     // 这个函数是用来做什么的？对服务器响应回来的数据进行统一处理
     var res_data = res.data;

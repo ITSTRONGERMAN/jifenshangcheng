@@ -11,7 +11,7 @@
             手机号码登录
           </li>
           <li style="margin: -2px 10px 0; cursor: none">|</li>
-          <li @click="isShowForm = false" :class="isShowForm ? '' : 'active'">
+          <li @click="toShowWeixin" :class="isShowForm ? '' : 'active'">
             微信登录
           </li>
         </ul>
@@ -56,18 +56,18 @@
           </div>
           <div class="btn" @click="submitLogin">登录</div>
         </div>
-        <div class="qrcode" v-show="!isShowForm">二维码</div>
+        <div class="qrcode" v-show="!isShowForm" id="weixin"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 // 导入获取数据验证码的api
 import { SendSmsAPI } from "@/API";
 // 导入发送登录请求的方法
-import { SendLoginRequest } from "@/API";
+import { SendLoginRequestAPI } from "@/API";
 // 导入验证手机号是否正确的方法
 import verifyPhoneNumber from "@/utils/verifyPhoneNumber";
 export default {
@@ -93,6 +93,27 @@ export default {
       changeShowLoginModal: "ShowLoginModal/changeShowLoginModal",
       changeIsLogined: "LoginStatus/changeIsLogined",
     }),
+    ...mapActions({
+      asyncchangeIsShowTips: "ShowTips/asyncchangeIsShowTips",
+    }),
+    toShowWeixin() {
+      this.isShowForm = false;
+      let _this = this;
+      new WxLogin({
+        id: "weixin",
+        appid: "wx67cfaf9e3ad31a0d", // 这个appid要填死
+        scope: "snsapi_login",
+        // 扫码成功后重定向的接⼝
+        redirect_uri: "https://sc.wolfcode.cn/cms/wechatUsers/shop/PC",
+        // state填写编码后的url
+        state: encodeURIComponent(
+          window.btoa("http://127.0.0.1:8080" + _this.$route.path)
+        ),
+        // 调⽤样式⽂件
+        href: `data:text/css;base64,Lyogd3hsb2dpbi5jc3MgKi8NCi5pbXBvd2VyQm94IC50aXRsZSwgLmltcG93ZXJCb3ggLmluZm97DQogIGRpc3BsYXk6IG5vbmU7DQp9DQoNCi5pbXBvd2VyQm94IC5xcmNvZGV7DQogIG1hcmdpbi1ib3R0b206IC0yMHB4Ow0KfQ==
+              `,
+      });
+    },
     close() {
       this.changeShowLoginModal(false);
     },
@@ -115,15 +136,18 @@ export default {
         return;
       }
       if (!this.smsCode) {
-        alert("请输入验证码");
+        this.asyncchangeIsShowTips({
+          type: "warning",
+          msg: "短信验证码不能为空",
+        });
         return;
       }
-      let res = await SendLoginRequest({
+      let res = await SendLoginRequestAPI({
         phone: this.phoneNumber,
         verifyCode: this.smsCode,
       });
       if (res) {
-        alert("登录成功");
+        this.asyncchangeIsShowTips({ type: "success", msg: "登录成功" });
         this.close();
         // 本地存储token
         localStorage.setItem("x-auth-token", res["x-auth-token"]);
@@ -134,13 +158,16 @@ export default {
     verifyForm() {
       // 验证滑块是否验证成功
       if (this.msg == "再试一次" || this.msg == "请向右滑动") {
-        alert("滑块失败");
+        this.asyncchangeIsShowTips({ type: "warning", msg: "滑块验证未验证" });
         return false;
       }
       // 验证手机号输入格式是否正确1
       var isTrue = verifyPhoneNumber(this.phoneNumber);
       if (!isTrue) {
-        alert("请输入正确的手机号");
+        this.asyncchangeIsShowTips({
+          type: "warning",
+          msg: "请输入正确的手机号",
+        });
         this.$refs.phone.focus();
         this.phoneNumber = "";
         return false;
@@ -155,7 +182,7 @@ export default {
       // 获取短信验证码
       let res = await SendSmsAPI({ phone: this.phoneNumber });
       if (res) {
-        alert("短信验证码发送成功");
+        this.asyncchangeIsShowTips({ type: "success", msg: "短信发送成功" });
         this.countDown();
         this.isShowCount = true;
       }
@@ -284,6 +311,11 @@ export default {
           background: var(--basecolor);
           color: #fff;
         }
+      }
+      .qrcode {
+        margin-top: -20px;
+        display: flex;
+        justify-content: center;
       }
     }
   }

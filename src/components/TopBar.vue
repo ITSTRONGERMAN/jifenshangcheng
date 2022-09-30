@@ -9,7 +9,8 @@
               src="../assets/img/userImg.f8bbec5e.png"
               alt=""
               class="avatar"
-            />用户名：游客
+            />
+            用户名：游客
           </li>
           <li>我的积分：--</li>
           <li>获取积分</li>
@@ -27,7 +28,8 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
+import { WeixinLoginAPI } from "@/API";
 export default {
   name: "TopBar",
   data() {
@@ -38,6 +40,9 @@ export default {
       timer: null,
     };
   },
+  created(){
+    
+  },
   computed: {
     ...mapState({
       isLogined: (state) => state.LoginStatus.isLogined,
@@ -46,7 +51,9 @@ export default {
   methods: {
     ...mapMutations({
       changeShowLoginModal: "ShowLoginModal/changeShowLoginModal",
-      changeShowTips: "ShowTips/changIsShowTips",
+    }),
+    ...mapActions({
+      asyncchangeIsShowTips: "ShowTips/asyncchangeIsShowTips",
     }),
     // 登录页面
     toLogin() {
@@ -54,11 +61,7 @@ export default {
     },
     // 通过验证登录是否成功,从而显示不同的提示
     toShowTips() {
-      this.changeShowTips({ isShow: true, msg: "登录成功", type: "success" });
-      clearTimeout(this.timer);
-      this.timer = setTimeout(() => {
-        this.changeShowTips({ isShow: false, msg: "登录成功", type: "success" });
-      }, 2000);
+      this.asyncchangeIsShowTips({ msg: "登录失败", type: "warning" });
     },
   },
 };

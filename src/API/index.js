@@ -1,9 +1,13 @@
 // 统一管理所以的请求路径
 import request from './request'
 import qs from 'qs'
-// 精品推荐Api
-export const JingpingAPi=()=>request.get('/products/recommend')
+// 精品推荐api
+export const JingpinAPI=()=>request.get('/products/recommend')
 // 手机短信验证码api
 export const SendSmsAPI=(params)=>request.post('/sendSMS',qs.stringify(params))
-// 发送登录请求
-export const SendLoginRequest=(params)=>request.post('/phoneRegin',qs.stringify(params))
+// 发送登录请求api
+export const SendLoginRequestAPI=(params)=>request.post('/phoneRegin',qs.stringify(params))
+// 微信登录api
+export const WeixinLoginAPI=(params)=>request.post('/wechatUsers/PCLogin',qs.stringify(params))
+// 热门商品api
+export const HotProduct=()=>request.get('/products/hot')

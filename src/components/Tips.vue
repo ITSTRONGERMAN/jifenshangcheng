@@ -36,6 +36,7 @@ export default {
   padding: 10px 20px;
   border-radius: 6px;
   box-shadow: 0 0 10px #fff;
+  z-index: 9999;
   i {
     margin-right: 8px;
   }
