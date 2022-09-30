@@ -10,4 +10,4 @@ export const SendLoginRequestAPI=(params)=>request.post('/phoneRegin',qs.stringi
 // 微信登录api
 export const WeixinLoginAPI=(params)=>request.post('/wechatUsers/PCLogin',qs.stringify(params))
 // 热门商品api
-export const HotProduct=()=>request.get('/products/hot')
+export const HotProductAPI=()=>request.get('/products/hot')

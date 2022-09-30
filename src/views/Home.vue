@@ -22,8 +22,16 @@
       :imgicon="require('@/assets/img/hot.png')"
       :titletxt="'热门兑换'"
     ></Title>
-    <div class="av-panel">
-      
+    <div class="product-list mb20">
+      <ProductBox
+        v-for="(p, index) in hotProduct"
+        :key="index"
+        :imgSrc="p.coverImg"
+        :productName="p.name"
+        :jifen="p.coin"
+        :isHot="p.isHotSale"
+        :isNew="p.isLatest"
+      ></ProductBox>
     </div>
   </div>
 </template>
@@ -31,23 +39,34 @@
 <script>
 import Title from "@/components/Title.vue";
 import ProductBox from "@/components/ProductBox.vue";
-import { JingpinAPI } from "@/API";
+import { JingpinAPI, HotProductAPI } from "@/API";
 export default {
   name: "Home",
   components: { Title, ProductBox },
   data() {
     return {
       jingpinProducts: [],
+      hotProduct: [],
     };
   },
   mounted() {
     this.getJingpinData();
+    this.getHotData();
   },
   methods: {
     getJingpinData() {
       JingpinAPI()
         .then((result) => {
           this.jingpinProducts = result.data.data.records;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    getHotData() {
+      HotProductAPI()
+        .then((result) => {
+          this.hotProduct = result.data.data.records;
         })
         .catch((err) => {
           console.log(err);
@@ -73,6 +92,12 @@ export default {
     width: 100%;
     margin-top: 20px;
     display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+  }
+  .ad-panel {
+    height: 180px;
+    margin-top: 20px;
   }
 }
 </style>

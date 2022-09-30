@@ -31,8 +31,7 @@ export default {
   background: #fff;
   transition: all 0.5s;
   position: relative;
-  margin: 0 20px;
-  box-sizing: border-box;
+  margin: 20px 5px 0 5px;
   &:hover {
     transform: translateY(-6px);
   }
