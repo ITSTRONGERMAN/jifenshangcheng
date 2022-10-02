@@ -4,7 +4,7 @@
       <div class="l">欢迎来到叩丁狼积分商城</div>
       <div class="r">
         <ul>
-          <li @click="toShowTips">
+          <li>
             <img
               src="../assets/img/userImg.f8bbec5e.png"
               alt=""
@@ -40,8 +40,16 @@ export default {
       timer: null,
     };
   },
-  created(){
-    
+  created() {
+    this.wechatLogin();
+  },
+  watch: {
+    "$route.path":{
+      immediate:true,
+      handler(newval, oldval) {
+        this.changeIsLogined(Boolean(localStorage.getItem('x-auth-token')));
+      }
+    },
   },
   computed: {
     ...mapState({
@@ -51,6 +59,7 @@ export default {
   methods: {
     ...mapMutations({
       changeShowLoginModal: "ShowLoginModal/changeShowLoginModal",
+      changeIsLogined: "LoginStatus/changeIsLogined",
     }),
     ...mapActions({
       asyncchangeIsShowTips: "ShowTips/asyncchangeIsShowTips",
@@ -59,9 +68,37 @@ export default {
     toLogin() {
       this.changeShowLoginModal(true);
     },
-    // 通过验证登录是否成功,从而显示不同的提示
-    toShowTips() {
-      this.asyncchangeIsShowTips({ msg: "登录失败", type: "warning" });
+    // 微信扫码登录
+    async wechatLogin() {
+      /*微信扫码得到的code，code超过2分钟会过期，
+      过期的code去做请求会返回400，
+      需要重新扫码获取e.query.code;*/
+      let myCode = this.$route.query.code;
+      // 根据判断接口返还code而进行不同操作.
+      if (myCode) {
+        let res = await WeixinLoginAPI({ code: myCode });
+        // 服务器的状态码
+        let code = res.code;
+        /*0代表成功,400请重新扫描，407代表需要用户手机再做一次验证码登录*/
+        if (code == 0) {
+          this.$router.push(this.$route.path);
+          this.changeIsLogined(true);
+          // 本地
+          localStorage.setItem('x-auth-token',res['x-auth-token'])
+        } else if (code == 400) {
+          this.asyncchangeIsShowTips({
+            type: "warning",
+            msg: "微信二维码已经失效，请重新扫码登录",
+          });
+          this.changeShowLoginModal(true);
+        } else if (code == 407) {
+          this.asyncchangeIsShowTips({
+            type: "warning",
+            msg: "请使用手机号绑定登录微信",
+          });
+          localStorage.setItem("uuid", res.uuid);
+        }
+      }
     },
   },
 };

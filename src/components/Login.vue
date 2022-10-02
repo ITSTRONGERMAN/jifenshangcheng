@@ -65,9 +65,12 @@
 <script>
 import { mapActions, mapMutations } from "vuex";
 // 导入获取数据验证码的api
-import { SendSmsAPI } from "@/API";
-// 导入发送登录请求的方法
-import { SendLoginRequestAPI } from "@/API";
+import {
+  SendSmsAPI,
+  PhoneBindWexinAPI,
+  SendLoginRequestAPI,
+  WeixinLoginAPI,
+} from "@/API";
 // 导入验证手机号是否正确的方法
 import verifyPhoneNumber from "@/utils/verifyPhoneNumber";
 export default {
@@ -142,16 +145,32 @@ export default {
         });
         return;
       }
-      let res = await SendLoginRequestAPI({
-        phone: this.phoneNumber,
-        verifyCode: this.smsCode,
-      });
-      if (res) {
-        this.asyncchangeIsShowTips({ type: "success", msg: "登录成功" });
-        this.close();
-        // 本地存储token
-        localStorage.setItem("x-auth-token", res["x-auth-token"]);
-        this.changeIsLogined(true);
+      // 根据有没有uuid从而发出对应请求
+      let uuid = localStorage.getItem("uuid");
+      let res = null;
+      if (uuid) {
+        res = await PhoneBindWexinAPI({
+          phone: this.phoneNumber,
+          verifyCode: this.smsCode,
+          uuid: uuid,
+        });
+      } else {
+        res = await SendLoginRequestAPI({
+          phone: this.phoneNumber,
+          verifyCode: this.smsCode,
+        });
+      }
+      if (!res) return;
+      this.asyncchangeIsShowTips({ type: "success", msg: "登录成功" });
+      this.close();
+      // 本地存储token
+      localStorage.setItem("x-auth-token", res["x-auth-token"]);
+      this.changeIsLogined(true);
+      // 删除本地存储中的uuid
+      if (uuid) {
+        localStorage.removeItem("uuid");
+        // 清除浏览器路径中的code
+        this.$router.push(this.$route.path)
       }
     },
     // 验证表单是否正确的函数
@@ -161,7 +180,7 @@ export default {
         this.asyncchangeIsShowTips({ type: "warning", msg: "滑块验证未验证" });
         return false;
       }
-      // 验证手机号输入格式是否正确1
+      // 验证手机号输入格式是否正确
       var isTrue = verifyPhoneNumber(this.phoneNumber);
       if (!isTrue) {
         this.asyncchangeIsShowTips({

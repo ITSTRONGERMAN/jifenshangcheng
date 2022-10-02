@@ -1,5 +1,6 @@
 // 对axios进行封装
 import axios from "axios";
+import store from "@/store";
 // 创建axios实例
 const instance = axios.create({
   baseURL: "/api",
@@ -25,9 +26,12 @@ instance.interceptors.response.use(
     // 这个函数是用来做什么的？对服务器响应回来的数据进行统一处理
     var res_data = res.data;
     // 判断请求是否发送成功，0为成功，其他均为失败
-    if (res_data.code!= 0) {
-      alert(res_data.msg||res_data.message);
-      return;
+    if (res_data.code != 0 && res_data.code == 400 && res_data.code == 407) {
+      store._actions["ShowTips/asyncchangeIsShowTips"][0]({
+        type: "warning",
+        msg: res_data.msg,
+      });
+      return false;
     }
     return res_data;
   },

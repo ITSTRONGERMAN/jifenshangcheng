@@ -33,6 +33,10 @@
         :isNew="p.isLatest"
       ></ProductBox>
     </div>
+    <Title
+      :imgicon="require('@/assets/img/score.png')"
+      :titletxt="'积分攻略'"
+    ></Title>
   </div>
 </template>
 
