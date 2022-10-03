@@ -69,7 +69,7 @@ import {
   SendSmsAPI,
   PhoneBindWexinAPI,
   SendLoginRequestAPI,
-  WeixinLoginAPI,
+  GetUserInfoAPI,
 } from "@/API";
 // 导入验证手机号是否正确的方法
 import verifyPhoneNumber from "@/utils/verifyPhoneNumber";
@@ -152,7 +152,7 @@ export default {
         res = await PhoneBindWexinAPI({
           phone: this.phoneNumber,
           verifyCode: this.smsCode,
-          uuid: uuid,
+          uuid,
         });
       } else {
         res = await SendLoginRequestAPI({
@@ -170,8 +170,9 @@ export default {
       if (uuid) {
         localStorage.removeItem("uuid");
         // 清除浏览器路径中的code
-        this.$router.push(this.$route.path)
+        this.$router.push(this.$route.path);
       }
+      this.$store.dispatch("changeUserInfo");
     },
     // 验证表单是否正确的函数
     verifyForm() {

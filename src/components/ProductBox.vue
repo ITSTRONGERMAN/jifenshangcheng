@@ -1,18 +1,18 @@
 <template>
-  <div class="product-box">
+  <div class="product-box" @click="goToDetails()">
     <div class="img">
-      <img :src="'http://sc.wolfcode.cn'+imgSrc" alt="" />
+      <img :src="'http://sc.wolfcode.cn' + imgSrc" alt="" />
     </div>
     <div class="product-detail">
-      <h2 class="mt22 product-name">{{productName}}</h2>
-      <h2 class="mt22 jifen">{{jifen}}积分</h2>
+      <h2 class="mt22 product-name">{{ productName }}</h2>
+      <h2 class="mt22 jifen">{{ jifen }}积分</h2>
       <div class="btn">立即兑换</div>
     </div>
     <div class="hot" v-show="isHot">
       <img src="../assets/img/section_hot.png" alt="" />
     </div>
     <div class="new" v-show="isNew">
-      <img src="../assets/img//section_new.png" alt="" />
+      <img src="../assets/img/section_new.png" alt="" />
     </div>
   </div>
 </template>
@@ -20,7 +20,17 @@
 <script>
 export default {
   name: "ProductBox",
-  props:['imgSrc','jifen','productName','isNew','isHot']
+  props: ["imgSrc", "jifen", "productName", "isNew", "isHot", "id"],
+  methods: {
+    goToDetails() {
+      this.$router.push({
+        name: "productdetail",
+        query:{
+          id:this.id
+        }
+      });
+    },
+  },
 };
 </script>
 
@@ -31,7 +41,8 @@ export default {
   background: #fff;
   transition: all 0.5s;
   position: relative;
-  margin: 20px 5px 0 5px;
+  margin-right: 20px;
+  margin-top: 10px;
   &:hover {
     transform: translateY(-6px);
   }

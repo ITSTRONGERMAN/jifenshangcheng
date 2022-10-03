@@ -16,12 +16,16 @@
         :jifen="p.coin"
         :isHot="p.isHotSale"
         :isNew="p.isLatest"
+        :id="p.id"
       ></ProductBox>
     </div>
     <Title
       :imgicon="require('@/assets/img/hot.png')"
       :titletxt="'热门兑换'"
     ></Title>
+    <div class="ad-panel">
+      <img src="../assets/img/ad.4c6b6225.png" alt="">
+    </div>
     <div class="product-list mb20">
       <ProductBox
         v-for="(p, index) in hotProduct"
@@ -31,6 +35,7 @@
         :jifen="p.coin"
         :isHot="p.isHotSale"
         :isNew="p.isLatest"
+        :id="p.id"
       ></ProductBox>
     </div>
     <Title
@@ -98,6 +103,9 @@ export default {
     display: flex;
     flex-wrap: wrap;
     box-sizing: border-box;
+    :nth-child(4n){
+      margin-right: 0 !important;
+    }
   }
   .ad-panel {
     height: 180px;

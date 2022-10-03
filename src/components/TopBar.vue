@@ -5,21 +5,17 @@
       <div class="r">
         <ul>
           <li>
-            <img
-              src="../assets/img/userImg.f8bbec5e.png"
-              alt=""
-              class="avatar"
-            />
-            用户名：游客
+            <img :src="userInfo.headImg" alt="" class="avatar" />
+            用户名：{{ userInfo.nickName }}
           </li>
-          <li>我的积分：--</li>
+          <li>我的积分：{{ userInfo.coin }}</li>
           <li>获取积分</li>
           <li>叩丁狼官网</li>
           <li class="login-btn" @click="toLogin" v-show="!isLogined">登录</li>
           <li class="car-btn" v-show="isLogined">
-            <img src="../assets/img/cart.png" alt="" />
+            <img src="../assets/img/search.png" alt="" />
             <span>购物车</span>
-            <b>{{ totalCar }}</b>
+            <b>{{ cartTotal }}</b>
           </li>
         </ul>
       </div>
@@ -34,8 +30,6 @@ export default {
   name: "TopBar",
   data() {
     return {
-      // 购物车总数量
-      totalCar: 0,
       // 定时器
       timer: null,
     };
@@ -44,16 +38,18 @@ export default {
     this.wechatLogin();
   },
   watch: {
-    "$route.path":{
-      immediate:true,
+    "$route.path": {
+      immediate: true,
       handler(newval, oldval) {
-        this.changeIsLogined(Boolean(localStorage.getItem('x-auth-token')));
-      }
+        this.changeIsLogined(Boolean(localStorage.getItem("x-auth-token")));
+      },
     },
   },
   computed: {
     ...mapState({
       isLogined: (state) => state.LoginStatus.isLogined,
+      cartTotal: (state) => state.GetUserInfo.cartTotal,
+      userInfo: (state) => state.GetUserInfo.userInfo,
     }),
   },
   methods: {
@@ -83,8 +79,9 @@ export default {
         if (code == 0) {
           this.$router.push(this.$route.path);
           this.changeIsLogined(true);
+          this.$store.dispatch("changeUserInfo");
           // 本地
-          localStorage.setItem('x-auth-token',res['x-auth-token'])
+          localStorage.setItem("x-auth-token", res["x-auth-token"]);
         } else if (code == 400) {
           this.asyncchangeIsShowTips({
             type: "warning",
@@ -97,6 +94,15 @@ export default {
             msg: "请使用手机号绑定登录微信",
           });
           localStorage.setItem("uuid", res.uuid);
+        }
+      } else {
+        // 没有mycode的情况
+        let mytoken = localStorage.getItem("x-auth-token");
+        this.changeIsLogined(Boolean(mytoken));
+        if (mytoken) {
+          this.$store.dispatch("changeUserInfo");
+        } else {
+          this.$store.commit("initUserInfo");
         }
       }
     },

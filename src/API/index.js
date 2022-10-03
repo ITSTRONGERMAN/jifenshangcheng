@@ -17,3 +17,7 @@ export const HotProductAPI = () => request.get("/products/hot");
 // 手机绑定微信api
 export const PhoneBindWexinAPI = (params) =>
   request.post("/wechatUsers/binding", qs.stringify(params));
+// 获取用户信息api
+export const GetUserInfoAPI = () => request.get("/shop/userProfiles");
+// 商品详情api
+export const ProductDetailAPI = (id) => request.get(`/products/${id}`);

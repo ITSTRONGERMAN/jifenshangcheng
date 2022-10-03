@@ -12,6 +12,11 @@ instance.interceptors.request.use(
     // 什么时候执行这个函数？在请求发出之前
     // config是什么？ 是一个对象，保存了关于这次请求的信息
     // 这个函数是用来做什么的？ 可以用来做一些请求前的准备（比如：添加请求头）
+    // 通过判断本地是否有token，来携带请求头
+    const token=localStorage.getItem('x-auth-token')
+    if(token){
+      config.headers['x-auth-token']=token
+    }
     return config;
   },
   (err) => {
