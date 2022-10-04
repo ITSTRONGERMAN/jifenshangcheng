@@ -1,6 +1,6 @@
 <template>
   <div class="details wrap">
-    <!-- <Crumb></Crumb> -->
+    <Crumb :nav="nav"></Crumb>
     <main>
       <div class="content">
         <div class="l">
@@ -52,15 +52,17 @@
               </ul>
             </section>
             <div style="margin: 10px 0">
-              <strong>数量 <span>*礼品库存99件</span></strong>
+              <strong
+                >数量 <span>*礼品库存{{ productInfo.stock }}件</span></strong
+              >
               <div class="step">
-                <div class="reduce">-</div>
+                <div class="reduce" @click="stepFn(-1)">-</div>
                 <input type="text" disabled v-model="stepNum" />
-                <div class="add">+</div>
+                <div class="add" @click="stepFn(1)">+</div>
               </div>
             </div>
             <div class="btns">
-              <div class="addToCart">加入购物车</div>
+              <div class="addToCart" @click="joinCart">加入购物车</div>
               <div class="buyNow">立即购买</div>
             </div>
           </div>
@@ -94,13 +96,15 @@
       </aside>
     </main>
     <ul class="tabs">
-      <li class="active">礼品详情</li>
-      <li>常见问题</li>
+      <li :class="showTab ? 'active' : ''" @click="showTab = true">礼品详情</li>
+      <li @click="showTab = false" :class="showTab ? '' : 'active'">
+        常见问题
+      </li>
     </ul>
-    <div>
+    <div v-show="showTab" v-html="productInfo.description">
       <!-- 商品详情的内容盒子 -->
     </div>
-    <div class="issue">
+    <div class="issue" v-show="!showTab">
       <!-- 常见问题的内容盒子 -->
       <h4>兑换后运费如何收取？</h4>
       <p>
@@ -135,16 +139,17 @@
 </template>
 
 <script>
-// import Crumb from "@/components/Crumb";
-import { ProductDetailAPI } from "@/API";
+import Crumb from "@/components/Crumb";
+import { ProductDetailAPI, JoionCartAPI } from "@/API";
+import { mapActions } from "vuex";
 export default {
-  // components: {
-  //   Crumb,
-  // },
+  components: {
+    Crumb,
+  },
   name: "Details",
   data() {
     return {
-      stepNum: 2,
+      stepNum: 1,
       // 面包屑
       nav: [],
       // 商品信息
@@ -155,6 +160,8 @@ export default {
       currentImgNum: 0,
       // 大图图片
       coverImg: "",
+      // 商品详情与常见问题的显示与隐藏
+      showTab: true,
     };
   },
   created() {
@@ -162,16 +169,23 @@ export default {
     this.getProductDetail();
   },
   methods: {
+    ...mapActions({
+      asyncchangeIsShowTips: "ShowTips/asyncchangeIsShowTips",
+    }),
     // 获取商品信息
     async getProductDetail() {
       let goodId = this.$route.query.id;
       // 获取到id后，发起请求
       let { data: res } = await ProductDetailAPI(goodId);
       this.productInfo = res.productInfo;
-      this.nav = res.nav;
+      this.nav = res.nav || [];
       this.themYouCanBuy = res.themYouCanBuy;
       this.coverImg = res.productInfo.imgAltas[0].src;
-      console.log("获取数据");
+      // 替换商品详情路径
+      this.productInfo.description = this.productInfo.description.replaceAll(
+        "upload/",
+        "https://sc.wolfcode.cn" + "/upload/"
+      );
     },
     // 你还能购买
     goToNewPage(id) {
@@ -187,6 +201,37 @@ export default {
     imgTab(index, src) {
       this.currentImgNum = index;
       this.coverImg = src;
+    },
+    // 控制商品个数
+    stepFn(val) {
+      if (
+        (val === -1 && this.stepNum <= 1) ||
+        (val === 1 && this.stepNum >= this.productInfo.stock)
+      )
+        return;
+      this.stepNum += val;
+    },
+    // 加入购物车
+    async joinCart() {
+      let goodId = this.$route.query.id;
+      let res = await JoionCartAPI({
+        productId: goodId,
+        total: this.stepNum,
+      });
+      console.log(res);
+      if (res.code == 0) {
+        this.asyncchangeIsShowTips({
+          type: "success",
+          msg: "加入购物车成功",
+          modified: 1,
+        });
+      } else {
+        this.asyncchangeIsShowTips({
+          type: "warning",
+          msg: res.message,
+          modified: 1,
+        });
+      }
     },
   },
 };

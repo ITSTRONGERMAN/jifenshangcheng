@@ -21,3 +21,6 @@ export const PhoneBindWexinAPI = (params) =>
 export const GetUserInfoAPI = () => request.get("/shop/userProfiles");
 // 商品详情api
 export const ProductDetailAPI = (id) => request.get(`/products/${id}`);
+// 加入购物车api
+export const JoionCartAPI = (params) =>
+  request.post("/shop/carts/add", qs.stringify(params));
