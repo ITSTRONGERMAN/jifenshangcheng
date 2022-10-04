@@ -2,7 +2,7 @@
   <div id="app">
     <TopBar></TopBar>
     <Header></Header>
-    <keep-alive>
+    <keep-alive exclude="Details">
       <router-view></router-view>
     </keep-alive>
     <Footer></Footer>
