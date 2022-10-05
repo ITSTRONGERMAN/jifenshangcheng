@@ -2,9 +2,9 @@
   <div id="app">
     <TopBar></TopBar>
     <Header></Header>
-    <keep-alive exclude="Details">
-      <router-view></router-view>
-    </keep-alive>
+      <keep-alive exclude="AllProduct,Details">
+        <router-view></router-view>
+      </keep-alive>
     <Footer></Footer>
     <Login v-show="isShowLogin"></Login>
     <transition name="tip">

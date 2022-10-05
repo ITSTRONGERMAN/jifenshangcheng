@@ -218,7 +218,6 @@ export default {
         productId: goodId,
         total: this.stepNum,
       });
-      console.log(res);
       if (res.code == 0) {
         this.asyncchangeIsShowTips({
           type: "success",

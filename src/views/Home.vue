@@ -28,8 +28,8 @@
     </div>
     <div class="product-list mb20">
       <ProductBox
-        v-for="(p, index) in hotProduct"
-        :key="index"
+        v-for="p in hotProduct"
+        :key="p.id"
         :imgSrc="p.coverImg"
         :productName="p.name"
         :jifen="p.coin"

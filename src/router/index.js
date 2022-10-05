@@ -21,7 +21,14 @@ const routes = [
   {
     path: "/person",
     name: "person",
+    redirect: "/person/cart",
     component: () => import("@/views/Person.vue"),
+    children: [
+      {
+        path: "cart",
+        component: () => import("@/components/Cart.vue"),
+      },
+    ],
   },
   {
     path: "/myorder",
@@ -41,13 +48,23 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  // scrollBehavior(to, from, savePosition) {
-  //   return {
-  //     top: 0,
-  //   };
-  // },
   mode: "history",
   routes,
 });
-
+// 导航守卫，每次跳转路由都会执行这个代码
+// 全局路由守卫
+// router.beforeEach((to, from, next) => {
+//   let token = localStorage.getItem("x-auth-token");
+//  if(to.path==='/person'){
+//   if(!token){
+//     store.dispatch('ShowTips/asyncchangeIsShowTips',{
+//       isShow:true,
+//       type:'warning',
+//       msg:'检测到您未登录请先登录，请先登录'
+//     })
+//     return
+//   }
+//  }
+//  next()
+// });
 export default router;

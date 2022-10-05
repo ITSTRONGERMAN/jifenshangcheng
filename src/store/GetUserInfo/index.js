@@ -18,15 +18,15 @@ const mutations = {
   },
   initUserInfo(state) {
     // 购物车数量
-    (state.cartTotal = 0),
-      (state.userInfo = {
-        // 用户名称
-        nickName: "游客",
-        // 鸡腿数
-        coin: "0",
-        // 头像
-        headImg: require("@/assets/img/userImg.f8bbec5e.png"),
-      });
+    state.cartTotal = 0;
+    state.userInfo = {
+      // 用户名称
+      nickName: "游客",
+      // 鸡腿数
+      coin: "0",
+      // 头像
+      headImg: require("@/assets/img/userImg.f8bbec5e.png"),
+    };
   },
 };
 const actions = {

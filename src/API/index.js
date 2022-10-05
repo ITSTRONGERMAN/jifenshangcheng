@@ -24,3 +24,8 @@ export const ProductDetailAPI = (id) => request.get(`/products/${id}`);
 // 加入购物车api
 export const JoionCartAPI = (params) =>
   request.post("/shop/carts/add", qs.stringify(params));
+// 商品搜索（含首页的“更多”）
+export const ProductSearchAPI = (params) =>
+  request.get("/products", { params });
+// 购物车信息
+export const GetCartInfoAPI = () => request.get("/shop/carts");
