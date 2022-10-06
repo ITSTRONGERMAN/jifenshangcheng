@@ -6,10 +6,11 @@
           <th style="width: 8%">
             <i
               :class="
-                checkAll
+                isCheckAll
                   ? 'iconfont icon-yduifuxuankuangxuanzhong'
                   : 'iconfont icon-yduifuxuankuang'
               "
+              @click="checkAll"
             ></i>
           </th>
           <th style="width: 30%">礼品信息</th>
@@ -54,24 +55,24 @@
           </td>
           <td>{{ item.totalCost }}鸡腿</td>
           <td>
-            <span class="del">删除</span>
+            <span class="del" @click="deleteCart(item.id)">删除</span>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="total">总计：<span>{{totalPrice}}鸡腿</span></div>
+    <div class="total">
+      总计：<span>{{ totalPrice }}鸡腿</span>
+    </div>
     <div class="submit">提交</div>
   </div>
 </template>
 <script>
-import { GetCartInfoAPI } from "@/API";
+import { GetCartInfoAPI, DeleteCartAPI } from "@/API";
 import { mapActions } from "vuex";
 export default {
   data() {
     return {
       stepNum: 1,
-      // 全选
-      checkAll: false,
       // 单选按钮数组
       checkList: [],
       // 购物车列表
@@ -91,6 +92,7 @@ export default {
   methods: {
     ...mapActions({
       asyncchangeIsShowTips: "ShowTips/asyncchangeIsShowTips",
+      // changeUserInfo: "GetUserInfo/changeUserInfo",
     }),
     async getCartInfo() {
       let res = await GetCartInfoAPI();
@@ -108,17 +110,47 @@ export default {
         this.checkList.push(true);
       }
     },
+    // 改变复选框状态
     changeCheck(index) {
-      this.checkList[index] = !this.checkList[index];
+      let checked = this.checkList[index];
+      this.checkList.splice(index, 1, !checked);
+    },
+    // 全选
+    checkAll() {
+      this.asyncchangeIsShowTips({
+        type: "warning",
+        msg: "抱歉由于技术原因，购物车的全选与反全选暂时不能使用，请您谅解",
+      });
+    },
+    async deleteCart(id) {
+      let res = await DeleteCartAPI(id);
+      this.getCartInfo();
+      this.$store.dispatch("changeUserInfo");
     },
   },
-  computed:{
-    totalPrice(){
-      return this.cartList.reduce((total,item)=>{
-        return total+=Number(item.totalCost)
-      },0)
-    }
-  }
+  computed: {
+    // 总价格
+    totalPrice() {
+      return this.cartList.reduce((total, item) => {
+        return (total += Number(item.totalCost));
+      }, 0);
+    },
+    // 全选复选框
+    isCheckAll: {
+      get() {
+        return this.checkList.reduce((total, item) => {
+          if (item) {
+            return (total += 1);
+          }
+        }, 0) == this.checkList.length
+          ? true
+          : false;
+      },
+      set(v) {
+        return v;
+      },
+    },
+  },
 };
 </script>
 <style lang="less" scoped>

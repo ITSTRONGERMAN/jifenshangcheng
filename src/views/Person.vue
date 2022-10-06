@@ -64,8 +64,12 @@ import Crumb from "@/components/Crumb.vue";
 import { mapActions, mapMutations, mapState } from "vuex";
 import store from "@/store";
 export default {
+  name: "Person",
   data() {
     return {};
+  },
+  created() {
+    console.log(213);
   },
   beforeRouteEnter(to, from, next) {
     let token = localStorage.getItem("x-auth-token");
@@ -74,12 +78,11 @@ export default {
         store.dispatch("ShowTips/asyncchangeIsShowTips", {
           isShow: true,
           type: "warning",
-          msg: "检测到您未登录!请先登录",
+          msg: "抱歉检测到您未登录!请先登录",
         });
         return;
       }
     }
-    console.log(2131);
     next();
   },
   computed: {
@@ -94,18 +97,15 @@ export default {
     ...mapActions({
       asyncchangeIsShowTips: "ShowTips/asyncchangeIsShowTips",
     }),
-    ...mapMutations({
-      initUserInfo: "GetUserInfo/initUserInfo",
-    }),
     loginOutFn() {
       localStorage.removeItem("x-auth-token");
       this.asyncchangeIsShowTips({
         type: "success",
         msg: "退出登录成功",
       });
-      this.initUserInfo();
       setTimeout(() => {
         this.$router.push("/home");
+        this.$store.commit("initUserInfo");
       }, 2000);
     },
   },

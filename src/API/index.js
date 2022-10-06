@@ -29,3 +29,6 @@ export const ProductSearchAPI = (params) =>
   request.get("/products", { params });
 // 购物车信息
 export const GetCartInfoAPI = () => request.get("/shop/carts");
+// 删除购物车
+export const DeleteCartAPI = (id) =>
+  request.delete(`/shop/carts?productIds=${id}`);
